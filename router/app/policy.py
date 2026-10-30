@@ -69,6 +69,14 @@ class RulesPolicy:
                 if not usable:
                     raise RegistryError(f"{path}: every option for {category}/{difficulty} is disabled or unknown")
                 self.chains.setdefault(category, {})[difficulty] = usable
+        # Optional: chains for hard questions in quality mode (more thinking time)
+        self.quality_hard: dict[str, list[str]] = {}
+        for category, raw in (data.get("quality_hard") or {}).items():
+            if category not in CATEGORIES:
+                raise RegistryError(f"{path}: quality_hard has unknown category '{category}'")
+            usable = [o for o in raw if registry.has(o) and registry.get(o).enabled]
+            if usable:
+                self.quality_hard[category] = usable
 
     def _tier_rank(self, option_id: str) -> int:
         return TIER_ORDER.index(self.registry.get(option_id).tier)
@@ -80,6 +88,9 @@ class RulesPolicy:
         notes = []
         if level != a.difficulty:
             notes.append(f"{mode} mode: routed as {level}")
+        if mode == "quality" and level == "hard" and a.category in self.quality_hard:
+            chain = list(self.quality_hard[a.category])
+            notes.append("quality mode: longest thinking")
         if a.structured_output:
             floor = TIER_ORDER.index(self.min_structured_tier)
             if self._tier_rank(chain[0]) < floor:

@@ -17,8 +17,7 @@
 #   enabled              include in routing and benchmarks
 #   web_search           searches the web before answering; only live-data questions are routed here
 #   search_context_size  low | medium | high (how much search content the model reads)
-#   per_call_usd         fixed fee per call on top of tokens. Web search: $25 per 1,000 calls for the
-#                        search-preview models (search content tokens are not billed separately)
+#   per_call_usd         fixed fee per call on top of tokens. Web search on gpt-5-search-api: $10 per 1,000 calls
 
 price_checked: "2026-10-28"
 
@@ -83,6 +82,18 @@ options:
     timeout_s: 30
     enabled: true
 
+  - id: gpt-5-mini-medium
+    model: openai/gpt-5-mini
+    tier: reasoning
+    input_usd_per_mtok: 0.25
+    output_usd_per_mtok: 2.00
+    reasoning_effort: medium
+    supports_temperature: false
+    min_output_tokens: 4000   # room to think AND answer; only tokens actually used are billed
+    demo_allowed: true    # same price as low and high; thinks about half as long as high
+    timeout_s: 45
+    enabled: true
+
   - id: gpt-5-mini-high
     model: openai/gpt-5-mini
     tier: reasoning
@@ -90,7 +101,7 @@ options:
     output_usd_per_mtok: 2.00
     reasoning_effort: high
     supports_temperature: false
-    min_output_tokens: 4000
+    min_output_tokens: 8000   # live finding: 4,000 was all spent thinking on hard SQL (empty answer)
     demo_allowed: true    # cheap per token; per-request and daily budgets cap the thinking cost
     timeout_s: 75
     enabled: true
@@ -114,9 +125,9 @@ options:
     input_usd_per_mtok: 1.25
     output_usd_per_mtok: 10.00
     per_call_usd: 0.01
-    reasoning_effort: null
+    reasoning_effort: null       # the search model takes no reasoning_effort or temperature
     supports_temperature: false
-    min_output_tokens: 1500
+    min_output_tokens: 1500      # it may think before answering; leave room
     web_search: true
     search_context_size: low
     demo_allowed: true
@@ -136,7 +147,7 @@ options:
     search_context_size: low
     demo_allowed: true
     timeout_s: 30
-    enabled: false
+    enabled: false   # retired by OpenAI (check_models: "has been deprecated", 2026-10-30)
 
   - id: gpt-4o-search
     model: openai/gpt-4o-search-preview
@@ -151,7 +162,7 @@ options:
     search_context_size: low
     demo_allowed: true
     timeout_s: 30
-    enabled: false
+    enabled: false   # retired by OpenAI (check_models: "has been deprecated", 2026-10-30)
 
   - id: o4-mini-medium
     model: openai/o4-mini

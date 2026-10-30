@@ -8,6 +8,14 @@ version: rules-1
 # A request that asks for JSON never starts below this tier: small models break JSON more often.
 structured_output_min_tier: mid
 
+# Hard questions in balanced mode use medium reasoning effort: same price per token as high, but it
+# thinks about half as long, so answers arrive in roughly half the time (live finding: high effort took
+# ~40 s on a hard SQL question). Quality mode swaps in these chains to let the model think longest.
+quality_hard:
+  loan_maths: [gpt-5-mini-high, gpt-5-medium, gpt-4.1]
+  sql:        [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+  python:     [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+
 chains:
   complaint:
     easy:   [gpt-5-nano-minimal, gpt-4.1-mini, gpt-4.1]
@@ -16,7 +24,7 @@ chains:
   loan_maths:          # arithmetic: start with a reasoning-capable model even when easy
     easy:   [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
     medium: [gpt-5-mini-low, gpt-5-mini-high, gpt-4.1]
-    hard:   [gpt-5-mini-high, gpt-5-medium, gpt-4.1]
+    hard:   [gpt-5-mini-medium, gpt-5-mini-high, gpt-4.1]
   extraction:
     easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
     medium: [gpt-4.1-mini, gpt-4.1, gpt-5-mini-low]
@@ -24,16 +32,18 @@ chains:
   sql:
     easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
     medium: [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
-    hard:   [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+    hard:   [gpt-5-mini-medium, gpt-4.1, gpt-5-mini-high]
   python:
     easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
     medium: [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
-    hard:   [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+    hard:   [gpt-5-mini-medium, gpt-4.1, gpt-5-mini-high]
   general:
     easy:   [gpt-5-nano-minimal, gpt-4.1-mini, gpt-4.1]
     medium: [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
     hard:   [gpt-4.1, gpt-5-mini-high, gpt-5-medium]
-  live_data:           # weather, news, today's prices: only web-search models can answer these
+  live_data:           # weather, news, today's prices: only the web-search model can answer these.
+                       # gpt-4.1-mini is the fallback so a search outage still gets a reply (it will say
+                       # it has no live data rather than leave the visitor with an error)
     easy:   [gpt-5-search, gpt-4.1-mini]
     medium: [gpt-5-search, gpt-4.1-mini]
     hard:   [gpt-5-search, gpt-4.1-mini]

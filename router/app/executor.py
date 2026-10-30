@@ -147,11 +147,24 @@ def _get(obj, name, default=None):
     return getattr(obj, name, default)
 
 
-def _default_completion(**kwargs):
-    import litellm  # imported lazily: tests and the registry never need it
+def preload_litellm() -> None:
+    """Load LiteLLM at startup instead of on the first request. It is a large library: on a small
+    cloud instance the first import took most of a minute, and the first visitor waited for it.
+    The bundled price map is used, so start-up never waits on a download (costs come from models.yaml)."""
+    import os
+
+    os.environ.setdefault("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+    import litellm
 
     litellm.drop_params = True  # silently drop params a model does not support
     litellm.suppress_debug_info = True  # no "Give Feedback" banner on errors
+
+
+def _default_completion(**kwargs):
+    import litellm  # already loaded by preload_litellm() in the server; tests never get here
+
+    litellm.drop_params = True
+    litellm.suppress_debug_info = True
     return litellm.completion(**kwargs)
 
 

@@ -13,7 +13,7 @@ import ExamplePairs from "./ExamplePairs";
 const MODES: { value: Mode; label: string; hint: string }[] = [
   { value: "cheapest", label: "Cheapest", hint: "treats every question as one level easier" },
   { value: "balanced", label: "Balanced", hint: "routes by the judged difficulty" },
-  { value: "quality", label: "Quality", hint: "treats every question as one level harder" },
+  { value: "quality", label: "Quality", hint: "one level harder; hard questions think longest (slower)" },
 ];
 
 interface Props {
@@ -96,7 +96,7 @@ export default function Playground({ demoMode, history, onResult }: Props) {
           </button>
         </div>
         <p className="mode-note">
-          Cheapest treats each question as one level easier, Quality as one level harder. Ctrl+Enter sends.
+          Cheapest treats each question as one level easier. Quality treats it as one level harder and lets hard questions think longest, so it is slower. Ctrl+Enter sends.
         </p>
       </section>
 

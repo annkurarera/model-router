@@ -45,7 +45,7 @@ export default function Home() {
               <span className="sep">Routing today: simple rules. Rules tuned on benchmark results come next.</span>
             </>
           ) : offline ? (
-            <><span className="lamp stop" aria-hidden="true" />Router not reachable at <span className="mono">{ROUTER_URL}</span></>
+            <><span className="lamp off" aria-hidden="true" />Router not reachable at <span className="mono">{ROUTER_URL}</span></>
           ) : (
             <><span className="lamp" aria-hidden="true" />Checking the router</>
           )}

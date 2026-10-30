@@ -52,7 +52,7 @@ button, input, textarea { font: inherit; color: inherit; }
 .connection .sep { padding-left: 16px; border-left: 1px solid var(--rule); }
 .lamp { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; background: var(--rule-strong); }
 .lamp.go { background: var(--go); }
-.lamp.stop { background: var(--stop); }
+.lamp.off { background: var(--stop); }
 .demo-note {
   margin: 16px 0 0; max-width: var(--measure); padding: 10px 14px;
   border-left: 3px solid var(--caution); background: #fbf5e9; font-size: 0.9375rem;

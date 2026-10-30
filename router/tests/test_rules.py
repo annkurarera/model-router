@@ -94,9 +94,24 @@ def test_policy_file_covers_every_category_and_difficulty(policy):
 def test_easy_and_hard_route_to_different_models(policy):
     easy = policy.decide([{"role": "user", "content": EXAMPLES[2][0]}])
     hard = policy.decide([{"role": "user", "content": EXAMPLES[3][0]}])
-    assert easy.chain[0] == "gpt-5-mini-low" and hard.chain[0] == "gpt-5-mini-high"
+    assert easy.chain[0] == "gpt-5-mini-low" and hard.chain[0] == "gpt-5-mini-medium"
     assert hard.category == "loan_maths" and hard.difficulty == "hard"
-    assert hard.reason.startswith("rules: loan maths, hard (") and "→ gpt-5-mini-high" in hard.reason
+    assert hard.reason.startswith("rules: loan maths, hard (") and "→ gpt-5-mini-medium" in hard.reason
+
+
+def test_quality_mode_lets_hard_questions_think_longest(policy):
+    """Live finding: high effort took ~40 s on hard SQL, so balanced uses medium and quality keeps high."""
+    for text in (EXAMPLES[3][0], EXAMPLES[7][0]):  # hard loan maths, hard SQL
+        balanced = policy.decide([{"role": "user", "content": text}])
+        quality = policy.decide([{"role": "user", "content": text}], mode="quality")
+        assert balanced.chain[0] == "gpt-5-mini-medium" and quality.chain[0] == "gpt-5-mini-high"
+        assert "quality mode: longest thinking" in quality.reason
+
+
+def test_medium_effort_costs_the_same_per_token_as_high(registry):
+    medium, high = registry.get("gpt-5-mini-medium"), registry.get("gpt-5-mini-high")
+    assert medium.cost_usd(1000, 1000) == high.cost_usd(1000, 1000)
+    assert medium.timeout_s < high.timeout_s and medium.min_output_tokens < high.min_output_tokens
 
 
 def test_cheapest_mode_moves_down_and_says_so(policy):
@@ -144,9 +159,9 @@ def test_api_reports_category_difficulty_and_signals(rules_client):
     client, provider, _ = rules_client
     body = ask(client, EXAMPLES[3][0]).json()
     meta = body["router"]
-    assert meta["policy_version"] == "rules-1" and meta["routed_to"] == "gpt-5-mini-high"
+    assert meta["policy_version"] == "rules-1" and meta["routed_to"] == "gpt-5-mini-medium"
     assert (meta["category"], meta["difficulty"]) == ("loan_maths", "hard")
-    assert meta["signals"] and provider.calls[0]["reasoning_effort"] == "high"
+    assert meta["signals"] and provider.calls[0]["reasoning_effort"] == "medium"
     assert client.get("/api/health").json()["policy_version"] == "rules-1"
 
 

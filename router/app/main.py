@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from .auth import AuthError, identify
 from .breaker import CircuitBreaker
 from .config import Settings, get_settings
-from .executor import ExecutionLimits, Executor
+from .executor import ExecutionLimits, Executor, preload_litellm
 from .limits import RateLimited, RateLimiter
 from .policy import RulesPolicy, StaticPolicy
 from .registry import Registry
@@ -30,6 +30,10 @@ def build_service(settings: Settings, completion_fn=None, clock=time.monotonic, 
         from .demo import DemoProvider
 
         completion_fn = DemoProvider(sleep)
+    elif completion_fn is None:
+        started = time.monotonic()
+        preload_litellm()  # before the server takes traffic, so no visitor waits for it
+        log.info("LiteLLM loaded in %.1f s", time.monotonic() - started)
     breaker = CircuitBreaker(settings.breaker_failure_threshold, settings.breaker_cooldown_s, clock)
     limits = ExecutionLimits(settings.per_call_timeout_s, settings.request_deadline_s, settings.max_model_calls,
                              settings.max_fallback_hops, settings.max_retries_per_call, settings.retry_backoff_s)

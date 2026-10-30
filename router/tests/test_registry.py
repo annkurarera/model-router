@@ -24,9 +24,9 @@ def test_cost_is_tokens_times_price(registry):
 
 def test_reasoning_options_reserve_thinking_tokens(registry):
     high = registry.get("gpt-5-mini-high")
-    assert high.output_budget(800) == 4000
+    assert high.output_budget(800) == 8000
     assert registry.get("gpt-4.1-mini").output_budget(800) == 800
-    assert high.worst_case_cost_usd(100, 800) == pytest.approx(high.cost_usd(100, 4000))
+    assert high.worst_case_cost_usd(100, 800) == pytest.approx(high.cost_usd(100, 8000))
 
 
 def _write(tmp_path, body: str):
@@ -87,3 +87,12 @@ def test_reasoning_options_have_longer_time_limits(registry):
 def test_non_positive_timeout_rejected(tmp_path):
     with pytest.raises(RegistryError, match="timeout_s"):
         Registry.load(_write(tmp_path, "options:\n" + BASE + ", timeout_s: 0}\n"))
+
+
+def test_reasoning_options_leave_room_to_answer_after_thinking(registry):
+    """Live finding: gpt-5-mini-high spent its whole 4,000-token budget thinking on a hard SQL question,
+    returned an empty answer after 48 s, and the request fell back. Only tokens used are billed."""
+    assert registry.get("gpt-5-mini-high").min_output_tokens >= 8000
+    assert registry.get("gpt-5-mini-medium").min_output_tokens >= 4000
+    worst = registry.get("gpt-5-mini-high").worst_case_cost_usd(200, 800)
+    assert worst < 0.05  # still inside the default per-request cost limit
