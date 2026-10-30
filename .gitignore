@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+*.db
+evals/cache/
+node_modules/
+.next/
+.DS_Store
+test-results/
+playwright-report/
+.env.local

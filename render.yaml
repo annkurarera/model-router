@@ -1,0 +1,40 @@
+# Render blueprint for the router API (the frontend goes on Vercel).
+# Secrets marked sync: false are typed into the Render dashboard, never committed.
+services:
+  - type: web
+    name: model-router-api
+    runtime: python
+    plan: free
+    rootDir: router
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ADMIN_API_KEYS          # a long random string only you know; never the example value
+        sync: false
+      - key: CORS_ORIGINS            # your Vercel address, e.g. https://model-router.vercel.app
+        sync: false
+      - key: DEMO_MODE
+        value: "false"
+      - key: ROUTING_POLICY
+        value: rules
+      - key: REFERENCE_MODEL
+        value: gpt-5-medium
+      - key: REFERENCE_SEARCH_MODEL
+        value: gpt-5-search
+      - key: TRUST_PROXY_HEADERS     # Render sits in front of the app; read the visitor's address from it
+        value: "true"
+      - key: DAILY_BUDGET_USD
+        value: "2.00"
+      - key: MAX_COST_PER_REQUEST_USD
+        value: "0.05"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "10"
+      - key: PER_CLIENT_DAILY_LIMIT
+        value: "50"
+      - key: DEBUG_LOG_TEXT
+        value: "false"

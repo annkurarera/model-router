@@ -1,0 +1,18 @@
+# Traffic mixes used to weight results (plan: Data > traffic mix).
+# Results are reported for each workload separately; savings are not claimed to generalise.
+
+workloads:
+  operations_desk:
+    description: Primary scenario, a bank operations assistant (headline numbers)
+    categories: {classification: 0.50, extraction: 0.20, reasoning: 0.20, sql: 0.05, python: 0.05}
+    difficulty: {easy: 0.50, medium: 0.30, hard: 0.20}
+
+  analyst_desk:
+    description: Harder work; shows where routing saves little
+    categories: {classification: 0.15, extraction: 0.15, reasoning: 0.35, sql: 0.20, python: 0.15}
+    difficulty: {easy: 0.20, medium: 0.40, hard: 0.40}
+
+  back_office_documents:
+    description: Extraction-heavy document processing
+    categories: {classification: 0.20, extraction: 0.55, reasoning: 0.15, sql: 0.05, python: 0.05}
+    difficulty: {easy: 0.40, medium: 0.40, hard: 0.20}

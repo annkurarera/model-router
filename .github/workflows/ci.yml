@@ -1,0 +1,39 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  router-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: router
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: router/requirements.txt
+      - run: pip install -r requirements.txt
+      # Fake providers and LiteLLM mock mode only: no API key, no cost
+      - run: python -m pytest
+      # Loan-maths calculator (source of truth for benchmark answers)
+      - run: python -m pytest
+        working-directory: .
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
+      # The router API is mocked inside the tests
+      - run: npm run test:e2e

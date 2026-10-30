@@ -1,0 +1,166 @@
+# Model pool. Each entry is one routing OPTION: a model plus its settings.
+# The same model at two reasoning-effort levels is two options, because cost and latency differ a lot.
+#
+# Prices: USD per 1 million tokens, standard (non-batch, non-cached) rates.
+# Checked 2026-10-28 against https://modelcompare.dev/pricing/openai-api-pricing.
+# Confirm on https://openai.com/api/pricing before every benchmark run and update price_checked.
+#
+# Fields
+#   id                   name used inside the router (policies, logs, API)
+#   model                LiteLLM model string sent to the provider
+#   tier                 tiny | mid | strong | reasoning
+#   reasoning_effort     minimal | low | medium | high, or null for non-reasoning models
+#   supports_temperature reasoning models reject a temperature setting
+#   min_output_tokens    reasoning models spend output tokens on thinking; budget at least this many
+#   timeout_s            seconds one call may take (reasoning models think longer); defaults to PER_CALL_TIMEOUT_S
+#   demo_allowed         may the public demo use it (expensive options stay offline)
+#   enabled              include in routing and benchmarks
+#   web_search           searches the web before answering; only live-data questions are routed here
+#   search_context_size  low | medium | high (how much search content the model reads)
+#   per_call_usd         fixed fee per call on top of tokens. Web search: $25 per 1,000 calls for the
+#                        search-preview models (search content tokens are not billed separately)
+
+price_checked: "2026-10-28"
+
+options:
+  - id: gpt-5-nano-minimal
+    model: openai/gpt-5-nano
+    tier: tiny
+    input_usd_per_mtok: 0.05
+    output_usd_per_mtok: 0.40
+    reasoning_effort: minimal
+    supports_temperature: false
+    min_output_tokens: 400
+    demo_allowed: true
+    timeout_s: 20
+    enabled: true
+
+  - id: gpt-4.1-nano
+    model: openai/gpt-4.1-nano
+    tier: tiny
+    input_usd_per_mtok: 0.10
+    output_usd_per_mtok: 0.40
+    reasoning_effort: null
+    supports_temperature: true
+    min_output_tokens: 0
+    demo_allowed: true
+    timeout_s: 20
+    enabled: false   # not available on this account (check_models: not_found, 2026-10-29)
+
+  - id: gpt-4.1-mini
+    model: openai/gpt-4.1-mini
+    tier: mid
+    input_usd_per_mtok: 0.40
+    output_usd_per_mtok: 1.60
+    reasoning_effort: null
+    supports_temperature: true
+    min_output_tokens: 0
+    demo_allowed: true
+    timeout_s: 20
+    enabled: true
+
+  - id: gpt-5-mini-low
+    model: openai/gpt-5-mini
+    tier: mid
+    input_usd_per_mtok: 0.25
+    output_usd_per_mtok: 2.00
+    reasoning_effort: low
+    supports_temperature: false
+    min_output_tokens: 800
+    demo_allowed: true
+    timeout_s: 30
+    enabled: true
+
+  - id: gpt-4.1
+    model: openai/gpt-4.1
+    tier: strong
+    input_usd_per_mtok: 2.00
+    output_usd_per_mtok: 8.00
+    reasoning_effort: null
+    supports_temperature: true
+    min_output_tokens: 0
+    demo_allowed: true
+    timeout_s: 30
+    enabled: true
+
+  - id: gpt-5-mini-high
+    model: openai/gpt-5-mini
+    tier: reasoning
+    input_usd_per_mtok: 0.25
+    output_usd_per_mtok: 2.00
+    reasoning_effort: high
+    supports_temperature: false
+    min_output_tokens: 4000
+    demo_allowed: true    # cheap per token; per-request and daily budgets cap the thinking cost
+    timeout_s: 75
+    enabled: true
+
+  - id: gpt-5-medium
+    model: openai/gpt-5
+    tier: reasoning
+    input_usd_per_mtok: 1.25
+    output_usd_per_mtok: 10.00
+    reasoning_effort: medium
+    supports_temperature: false
+    min_output_tokens: 4000
+    demo_allowed: false
+    timeout_s: 75
+    enabled: true
+
+  # Live data (weather, news, today's prices). The rules send only live-data questions here.
+  - id: gpt-5-search
+    model: openai/gpt-5-search-api
+    tier: strong
+    input_usd_per_mtok: 1.25
+    output_usd_per_mtok: 10.00
+    per_call_usd: 0.01
+    reasoning_effort: null
+    supports_temperature: false
+    min_output_tokens: 1500
+    web_search: true
+    search_context_size: low
+    demo_allowed: true
+    timeout_s: 60
+    enabled: true
+
+  - id: gpt-4o-mini-search
+    model: openai/gpt-4o-mini-search-preview
+    tier: mid
+    input_usd_per_mtok: 0.15
+    output_usd_per_mtok: 0.60
+    per_call_usd: 0.025
+    reasoning_effort: null
+    supports_temperature: false
+    min_output_tokens: 0
+    web_search: true
+    search_context_size: low
+    demo_allowed: true
+    timeout_s: 30
+    enabled: false
+
+  - id: gpt-4o-search
+    model: openai/gpt-4o-search-preview
+    tier: strong
+    input_usd_per_mtok: 2.50
+    output_usd_per_mtok: 10.00
+    per_call_usd: 0.025
+    reasoning_effort: null
+    supports_temperature: false
+    min_output_tokens: 0
+    web_search: true
+    search_context_size: low
+    demo_allowed: true
+    timeout_s: 30
+    enabled: false
+
+  - id: o4-mini-medium
+    model: openai/o4-mini
+    tier: reasoning
+    input_usd_per_mtok: 1.10
+    output_usd_per_mtok: 4.40
+    reasoning_effort: medium
+    supports_temperature: false
+    min_output_tokens: 4000
+    demo_allowed: false
+    timeout_s: 75
+    enabled: false   # turn on if the benchmark should include it

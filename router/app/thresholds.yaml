@@ -1,0 +1,23 @@
+# Quality bar a model must pass to qualify for a category x difficulty cell (plan: Routing logic).
+# Used by evals/calibrate.py (session 6). Starting values; final values are stated in docs/EVAL_REPORT.md.
+
+# 1. Absolute floor: minimum accuracy on the calibration set
+absolute_floor:
+  classification: 0.85
+  reasoning: 0.85
+  extraction: 0.90     # field-level accuracy
+  sql: 0.80
+  python: 0.80         # share of unit tests passed
+
+# 2. Paired margin: lower end of the 95% paired bootstrap interval for
+#    (model accuracy - strongest model accuracy) must be >= -margin points
+paired_margin_points:
+  cheapest: 10
+  balanced: 5
+  quality: 0
+
+bootstrap_resamples: 10000
+
+# Final acceptance rule for the router (fixed before the final test run)
+acceptance:
+  max_paired_drop_points: 5

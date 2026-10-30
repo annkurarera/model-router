@@ -1,0 +1,11 @@
+# Runtime
+litellm==1.105.7
+fastapi==0.162.0
+uvicorn==0.54.0
+pydantic==2.14.1
+pydantic-settings==2.16.2
+PyYAML==6.0.3
+python-dotenv==1.2.4
+# Tests
+pytest==9.2.0
+httpx==0.28.1

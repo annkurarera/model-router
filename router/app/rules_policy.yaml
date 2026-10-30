@@ -1,0 +1,39 @@
+# Hand-written routing policy (version rules-1).
+# For each category and difficulty: the model options to try, in order (primary, then fallbacks).
+# These are educated guesses, not measurements. Session 6 replaces this file with a policy
+# generated from benchmark results, and the strategy comparison reports how much better it is.
+
+version: rules-1
+
+# A request that asks for JSON never starts below this tier: small models break JSON more often.
+structured_output_min_tier: mid
+
+chains:
+  complaint:
+    easy:   [gpt-5-nano-minimal, gpt-4.1-mini, gpt-4.1]
+    medium: [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
+    hard:   [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
+  loan_maths:          # arithmetic: start with a reasoning-capable model even when easy
+    easy:   [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
+    medium: [gpt-5-mini-low, gpt-5-mini-high, gpt-4.1]
+    hard:   [gpt-5-mini-high, gpt-5-medium, gpt-4.1]
+  extraction:
+    easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
+    medium: [gpt-4.1-mini, gpt-4.1, gpt-5-mini-low]
+    hard:   [gpt-4.1, gpt-5-mini-low, gpt-5-mini-high]
+  sql:
+    easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
+    medium: [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
+    hard:   [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+  python:
+    easy:   [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
+    medium: [gpt-5-mini-low, gpt-4.1, gpt-5-mini-high]
+    hard:   [gpt-5-mini-high, gpt-4.1, gpt-5-medium]
+  general:
+    easy:   [gpt-5-nano-minimal, gpt-4.1-mini, gpt-4.1]
+    medium: [gpt-4.1-mini, gpt-5-mini-low, gpt-4.1]
+    hard:   [gpt-4.1, gpt-5-mini-high, gpt-5-medium]
+  live_data:           # weather, news, today's prices: only web-search models can answer these
+    easy:   [gpt-5-search, gpt-4.1-mini]
+    medium: [gpt-5-search, gpt-4.1-mini]
+    hard:   [gpt-5-search, gpt-4.1-mini]

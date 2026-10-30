@@ -1,0 +1,11 @@
+# Questions shown as examples on the playground. The leakage check (session 2) makes sure none of
+# these, or near-copies, appear in any evaluation set.
+examples:
+  - "Tag this complaint with one intent: my card was charged twice for one purchase."
+  - "A customer writes: my card was charged twice, the card is now blocked and last month's refund never arrived. Which issue should the bank handle first, and why?"
+  - "What is the EMI on a Rs 10 lakh loan at 10% a year for 5 years?"
+  - "Home loan of Rs 40 lakh at 8.75% for 20 years. After 3 years I prepay Rs 5 lakh and keep the same EMI. How many months sooner does the loan end?"
+  - "Extract the borrower name and loan amount: Dear Priya Sharma, we sanction a home loan of Rs 25,00,000."
+  - "Extract borrower name, PAN, co-applicant, loan amount, rate, tenure, sanction date and processing fee as JSON from: Ref HL/2026/118. Sanctioned 12-Oct-26 to Ms Priya Sharma (PAN ABCPS1234K), co-applicant Rahul Sharma: Rs 25 lakh at 8.75% p.a. for 240 months; fee 0.5% + GST."
+  - "Write SQL for total card spend by merchant category."
+  - "Write SQL for the top 3 merchants in each city by card spend, with each merchant's share of its city's total. Handle ties."
